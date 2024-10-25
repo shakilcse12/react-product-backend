@@ -1,21 +1,30 @@
 const express = require('express');
-const cors = require('cors');
+const cors = require("cors");
 const app = express();
-const products = require('./api/products.json');
+const products = require('./products.json');
 
-app.use(cors({
-  origin: '*', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: false
-}));
 
+const allowedOrigins = ['http://localhost:3000', 'https://react-product-frontend.web.app'];
+
+const corsOptions = {
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+
+app.use(cors(corsOptions));
+
+
+app.options('*', cors(corsOptions));
 
 app.get('/products', (req, res) => {
-  res.json(products); 
+  res.json(products);
 });
 
 app.get('/products/:id', (req, res) => {
-  const product = products.find(p => p._id === (req.params.id));
+  const product = products.find(p => p._id === req.params.id);
   if (!product) return res.status(404).send('Product not found');
   res.json(product);
 });
